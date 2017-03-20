@@ -14,7 +14,8 @@ repositories{
 
 dependencies{
     ext.testVersions = [
-            commonslang3: '3.4',
+            commonslang3: '3.5',
+            commonsMath3: '3.6.1',
             scala       : '2.11.8',
             gatling     : '2.1.7',
             akka        : '2.4.3',
@@ -24,6 +25,7 @@ dependencies{
     compile group: 'io.gatling', name: 'gatling-parent', version: testVersions.gatling
     compile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: testVersions.akka
     compile group: 'org.apache.commons', name: 'commons-lang3', version: testVersions.commonslang3
+    compile group: 'org.apache.commons', name: 'commons-math3', version: testVersions.commonsMath3
 
     gatling group: 'org.apache.commons', name: 'commons-lang3', version: testVersions.commonslang3
 }
