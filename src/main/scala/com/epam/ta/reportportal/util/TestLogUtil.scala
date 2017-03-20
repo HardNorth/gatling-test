@@ -22,6 +22,8 @@ object LogEntryGenerator extends Iterator[String] {
 
   private val threads = new ConcurrentHashMap[Long, Long]()
 
+  private val formats = new ConcurrentHashMap[Long, SimpleDateFormat]()
+
   private val random = new GammaDistribution(2, 2)
 
   override def hasNext: Boolean = true
@@ -39,7 +41,17 @@ object LogEntryGenerator extends Iterator[String] {
       }
     }
 
-    val sdf: SimpleDateFormat = new SimpleDateFormat(logTimeStampFormat)
+    val sdf: SimpleDateFormat = {
+      if (formats.containsKey(threadId)) {
+        formats.get(threadId)
+      }
+      else {
+        val threadSdf = new SimpleDateFormat(logTimeStampFormat)
+        formats.put(threadId, threadSdf)
+        threadSdf
+      }
+    }
+
     StringUtils.join(sdf.format(new Date()), " [Test thread (", threadNumber, ")] DEBUG TC", threadNumber,
       "_VerifyTextLogging - ", uniqueIdCounter.getAndIncrement(), " - ",
       RandomStringUtils.random(Math.round(random.sample() * 32).toInt, alphabet))
