@@ -6,7 +6,7 @@ package com.epam.ta.reportportal.util
 
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
-import java.awt.{Color, Rectangle, Shape}
+import java.awt._
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -47,15 +47,13 @@ private object Counter {
   def uniqueId(): Long = uniqueIdCounter.getAndIncrement()
 }
 
-object LogEntryGenerator extends Iterator[String] {
+private object LogEntry
+{
   val logTimeStampFormat = "HH:mm:ss.SSS"
-  val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 1234567890 - _:<>&\"'=+/\\,.$\t\n"
 
   private val formats = new ConcurrentHashMap[Long, SimpleDateFormat]()
 
-  override def hasNext: Boolean = true
-
-  override def next(): String = {
+  def logEntry(payload: String): String = {
     val threadNumber = Counter.threadNumber()
 
     val threadId = Thread.currentThread().getId
@@ -71,13 +69,24 @@ object LogEntryGenerator extends Iterator[String] {
     }
 
     StringUtils.join(sdf.format(new Date()), " [Test thread (", threadNumber, ")] DEBUG TC", threadNumber,
-      "_VerifyTextLogging - ", Counter.uniqueId(), " - ",
-      RandomStringUtils.random(Math.round(Random.gamma() * 32).toInt, alphabet))
+      "_VerifyTextLogging - ", Counter.uniqueId(), " - ", payload)
+  }
+}
+
+object LogEntryGenerator extends Iterator[String] {
+
+  val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 1234567890 - _:<>&\"'=+/\\,.$\t\n"
+
+  override def hasNext: Boolean = true
+
+  override def next(): String = {
+    LogEntry.logEntry(RandomStringUtils.random(Math.round(Random.gamma() * 32).toInt, alphabet))
   }
 }
 
 object PictureEntryGenerator extends Iterator[Array[Byte]] {
-  private val backgroundColor = new Color(255,255,255);
+  private val backgroundColor = new Color(255,255,255)
+  private val fontColor = new Color(0,0,0)
   val imageWidth = 1366
   val imageHeight = 768
   val minColor = 0
@@ -112,6 +121,14 @@ object PictureEntryGenerator extends Iterator[Array[Byte]] {
       graphics.setColor(new Color(nextInt(minColor, maxColor), nextInt(minColor, maxColor), nextInt(minColor, maxColor)))
       graphics.fill(shape)
     }
+    val s = LogEntry.logEntry("PNG Image")
+    graphics.setColor(fontColor)
+    graphics.setFont(new Font("Serif", Font.BOLD, 20))
+    val fm = graphics.getFontMetrics()
+    val y = fm.getHeight
+    graphics.drawString(s, 10, y)
+    graphics.dispose()
+
     val baos = new ByteArrayOutputStream()
     ImageIO.write(image, "png", baos)
     baos.toByteArray
