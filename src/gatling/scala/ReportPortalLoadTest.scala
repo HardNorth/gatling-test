@@ -27,6 +27,8 @@ class ReportPortalLoadTest extends Simulation {
 
   val testDurationMinutes = 1
 
+  val numberOfLogEventsInTest = 1000
+
   val reportPortalBaseUrl = "/"
 
   val postLog = feed(textFeeder, "Text Feeder").exec(http("Log Text Event").post("/").body(StringBody("${logEntry}"))).pause(Duration(textEventPause, TimeUnit.MILLISECONDS))
@@ -38,7 +40,7 @@ class ReportPortalLoadTest extends Simulation {
     .exec(http("Create Launch").get("/"))
     .exec(http("Create Test Suite").get("/"))
     .exec(http("Create Test Item").get("/"))
-    .repeat(1000, "Log event") {
+    .repeat(numberOfLogEventsInTest, "Log event") {
       randomSwitch(95.0 -> postLog, 5.0 -> postImage)
     }
   )
