@@ -8,12 +8,16 @@ import io.gatling.http.Predef._
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
 /**
-  * Created by delgr on 19.03.2017.
+  * Created by Vadzim Hushchanskou on 19.03.2017.
   */
 class ReportPortalLoadTest extends Simulation {
 
   val usersFileName = "users.tsv"
   val userFeeder = tsv(usersFileName).circular
+
+  val textFeeder = Iterator.continually(Map("logEntry" -> LogEntryGenerator.next()))
+
+  val imageFeeder = Iterator.continually(Map("logEntry" -> PictureEntryGenerator.next()))
 
   val textEventPause = 10
 
@@ -25,17 +29,16 @@ class ReportPortalLoadTest extends Simulation {
 
   val reportPortalBaseUrl = "/"
 
-  val postLog = exec(http("Log Text Event").post("/").body(StringBody(LogEntryGenerator.next()))).pause(Duration(textEventPause, TimeUnit.MILLISECONDS))
+  val postLog = feed(textFeeder, "Text Feeder").exec(http("Log Text Event").post("/").body(StringBody("${logEntry}"))).pause(Duration(textEventPause, TimeUnit.MILLISECONDS))
 
-  val postImage = exec(http("Log Picture Event").post("/").body(ByteArrayBody(PictureEntryGenerator.next()))).pause(Duration(pictureEventPause, TimeUnit.MILLISECONDS))
+  val postImage = feed(imageFeeder, "Image Feeder").exec(http("Log Picture Event").post("/").body(ByteArrayBody("${logEntry}"))).pause(Duration(pictureEventPause, TimeUnit.MILLISECONDS))
 
   val scn = scenario("ReportPortal load test").exec(feed(userFeeder)
     .exec(http("Authenticate").get("/"))
     .exec(http("Create Launch").get("/"))
     .exec(http("Create Test Suite").get("/"))
     .exec(http("Create Test Item").get("/"))
-    .repeat(1050, "Log event")
-    {
+    .repeat(1000, "Log event") {
       randomSwitch(95.0 -> postLog, 5.0 -> postImage)
     }
   )

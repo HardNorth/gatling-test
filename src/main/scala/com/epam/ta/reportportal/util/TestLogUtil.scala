@@ -1,7 +1,3 @@
-/*
- * Copyright (C) 2017 Epic Games, Inc. All Rights Reserved.
- */
-
 package com.epam.ta.reportportal.util
 
 import java.awt.geom.Ellipse2D
