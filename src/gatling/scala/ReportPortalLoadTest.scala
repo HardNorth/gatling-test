@@ -1,3 +1,4 @@
+import java.util.Properties
 import java.util.concurrent.TimeUnit
 
 import com.epam.ta.reportportal.util.{LogEntryGenerator, PictureEntryGenerator}
@@ -12,24 +13,31 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
   */
 class ReportPortalLoadTest extends Simulation {
 
-  val usersFileName = "users.tsv"
+  val (usersFileName, textEventPause, pictureEventPause, numberOfLogEventsInTest, userNumber, testDurationMinutes, reportPortalBaseUrl)=
+    try {
+      val prop = new Properties()
+      prop.load(ClassLoader.getSystemClassLoader.getResourceAsStream(System.getProperty("env") + ".properties"))
+
+      (
+        prop.getProperty("com.epam.ta.reportportal.test.load.users.file.name"),
+        new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.event.text.pause")).toLong,
+        new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.event.picture.pause")).toLong,
+        new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.event.number")).toInt,
+        new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.user.number")),
+        new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.test.duration")).toLong,
+        prop.getProperty("com.epam.ta.reportportal.test.load.test.base.url")
+        )
+    } catch {
+      case e: Exception =>
+        e.printStackTrace()
+        sys.exit(1)
+    }
+
   val userFeeder = tsv(usersFileName).circular
 
   val textFeeder = Iterator.continually(Map("logEntry" -> LogEntryGenerator.next()))
 
   val imageFeeder = Iterator.continually(Map("logEntry" -> PictureEntryGenerator.next()))
-
-  val textEventPause = 10
-
-  val pictureEventPause = 100
-
-  val userNumber = 1
-
-  val testDurationMinutes = 1
-
-  val numberOfLogEventsInTest = 1000
-
-  val reportPortalBaseUrl = "/"
 
   val postLog = feed(textFeeder, "Text Feeder").exec(http("Log Text Event").post("/").body(StringBody("${logEntry}"))).pause(Duration(textEventPause, TimeUnit.MILLISECONDS))
 
