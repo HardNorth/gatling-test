@@ -51,18 +51,7 @@ private object LogEntry
 
   def logEntry(payload: String): String = {
     val threadNumber = Counter.threadNumber()
-
-    val threadId = Thread.currentThread().getId
-    val sdf: SimpleDateFormat = {
-      if (formats.containsKey(threadId)) {
-        formats.get(threadId)
-      }
-      else {
-        val threadSdf = new SimpleDateFormat(logTimeStampFormat)
-        formats.put(threadId, threadSdf)
-        threadSdf
-      }
-    }
+    val sdf: SimpleDateFormat = formats.computeIfAbsent(threadNumber, (k) => new SimpleDateFormat(logTimeStampFormat))
 
     StringUtils.join(sdf.format(new Date()), " [Test thread (", threadNumber, ")] DEBUG TC", threadNumber,
       "_VerifyTextLogging - ", Counter.uniqueId(), " - ", payload)
