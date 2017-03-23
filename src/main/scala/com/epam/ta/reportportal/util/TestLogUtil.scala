@@ -92,10 +92,14 @@ object PictureEntryGenerator extends Iterator[Array[Byte]] {
     for (i <- 0 to numberOfFigures) {
       var shape: Shape = null
       if (i < rectangles) {
-        val x = nextInt(0, imageWidth)
-        val y = nextInt(0, imageHeight)
-        val width = nextInt(x, imageWidth + 1)
-        val height = nextInt(y, imageHeight + 1)
+        val x1 = nextInt(0, imageWidth + 1)
+        val y1 = nextInt(0, imageHeight + 1)
+        val x2 = nextInt(0, imageWidth + 1)
+        val y2 = nextInt(0, imageHeight + 1)
+        val x = Math.min(x1, x2)
+        val y = Math.min(y1, y2)
+        val width = Math.max(x1, x2) - x
+        val height = Math.max(y1, y2) - y
         shape = new Rectangle(x, y, width, height)
       } else {
         val x = nextInt(0, imageWidth)
