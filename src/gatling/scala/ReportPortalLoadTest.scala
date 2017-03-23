@@ -16,7 +16,7 @@ class ReportPortalLoadTest extends Simulation {
   val (usersFileName, textEventPause, pictureEventPause, numberOfLogEventsInTest, userNumber, testDurationMinutes, reportPortalBaseUrl)=
     try {
       val prop = new Properties()
-      prop.load(ClassLoader.getSystemClassLoader.getResourceAsStream(System.getProperty("env") + ".properties"))
+      prop.load(ClassLoader.getSystemClassLoader.getResourceAsStream("test.properties"))
 
       (
         prop.getProperty("com.epam.ta.reportportal.test.load.users.file.name"),
