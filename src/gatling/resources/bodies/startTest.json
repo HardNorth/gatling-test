@@ -1,0 +1,6 @@
+{
+  "name": "${testName}",
+  "start_time": ${testStartTime},
+  "launch_id": "${launchId}",
+  "type": "TEST"
+}

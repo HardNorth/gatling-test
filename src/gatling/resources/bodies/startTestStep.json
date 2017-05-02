@@ -1,0 +1,7 @@
+{
+  "name": "${testStepName}",
+  "description": "",
+  "start_time": ${stepStartTime},
+  "launch_id": "${launchId}",
+  "type": "STEP"
+}

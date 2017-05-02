@@ -1,0 +1,5 @@
+{
+  "name": "${launchName}",
+  "start_time": ${startTime},
+  "mode": "DEFAULT"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Load Test Suite",
+  "start_time": ${startTime},
+  "launch_id": "${launchId}",
+  "type": "SUITE"
+}

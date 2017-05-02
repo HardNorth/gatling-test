@@ -1,4 +1,4 @@
-import java.util.Properties
+import java.util.{Date, Properties, UUID}
 import java.util.concurrent.TimeUnit
 
 import com.epam.ta.reportportal.util.{LogEntryGenerator, PictureEntryGenerator}
@@ -13,7 +13,8 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
   */
 class ReportPortalLoadTest extends Simulation {
 
-  val (usersFileName, textEventPause, pictureEventPause, numberOfLogEventsInTest, userNumber, testDurationMinutes, reportPortalBaseUrl)=
+  val (usersFileName, textEventPause, pictureEventPause, numberOfLogEventsInTest, userNumber, testDurationMinutes,
+  reportPortalBaseUrl, projectName)=
     try {
       val prop = new Properties()
       prop.load(ClassLoader.getSystemClassLoader.getResourceAsStream("test.properties"))
@@ -24,8 +25,9 @@ class ReportPortalLoadTest extends Simulation {
         new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.event.picture.pause")).toLong,
         new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.event.number")).toInt,
         new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.user.number")),
-        new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.test.duration")).toLong,
-        prop.getProperty("com.epam.ta.reportportal.test.load.test.base.url")
+        new Integer(prop.getProperty("com.epam.ta.reportportal.test.load.duration")).toLong,
+        prop.getProperty("com.epam.ta.reportportal.test.load.base.url"),
+        prop.getProperty("com.epam.ta.reportportal.test.load.project.name")
         )
     } catch {
       case e: Exception =>
@@ -37,17 +39,24 @@ class ReportPortalLoadTest extends Simulation {
 
   val textFeeder = Iterator.continually(Map("logEntry" -> LogEntryGenerator.next()))
 
-  val imageFeeder = Iterator.continually(Map("logEntry" -> PictureEntryGenerator.next()))
+  val imageFeeder = Iterator.continually(Map("logEntry" -> LogEntryGenerator.next(),
+    "picture" -> PictureEntryGenerator.next(), "fileName" -> {UUID.randomUUID().toString + ".png"}))
 
   val postLog = feed(textFeeder, "Text Feeder").exec(http("Log Text Event").post("/").body(StringBody("${logEntry}"))).pause(Duration(textEventPause, TimeUnit.MILLISECONDS))
 
   val postImage = feed(imageFeeder, "Image Feeder").exec(http("Log Picture Event").post("/").body(ByteArrayBody("${logEntry}"))).pause(Duration(pictureEventPause, TimeUnit.MILLISECONDS))
 
-  val scn = scenario("ReportPortal load test").exec(feed(userFeeder)
-    .exec(http("Authenticate").get("/"))
-    .exec(http("Create Launch").get("/"))
-    .exec(http("Create Test Suite").get("/"))
-    .exec(http("Create Test Item").get("/"))
+  val scn = scenario("ReportPortal load test")
+    .exec(session => session
+      .set("projectName", projectName)
+      .set("launchName", "LoadTestLaunch_" + UUID.randomUUID().toString)
+      .set("startTime", System.currentTimeMillis()))
+    .exec(feed(userFeeder)
+    .exec(http("Create Test Launch").post("${projectName}/launch").body(ElFileBody("startLaunch.json"))
+      .check(status.is(200), jsonPath("$._id").saveAs("launchId")))
+    .exec(http("Create Test Suite").post("${projectName}/item").body(ElFileBody("startLaunch.json"))
+      .check(status.is(200), jsonPath("$._id").saveAs("suiteId")))
+    .exec(http("Create Test Item").get("${project_name}/item/${suiteId}"))
     .repeat(numberOfLogEventsInTest, "Log event") {
       randomSwitch(95.0 -> postLog, 5.0 -> postImage)
     }
