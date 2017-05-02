@@ -7,6 +7,7 @@ import io.gatling.core.body.StringBody
 import io.gatling.http.Predef._
 
 import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.util.Random
 
 /**
   * Created by Vadzim Hushchanskou on 19.03.2017.
@@ -47,18 +48,23 @@ class ReportPortalLoadTest extends Simulation {
   val postImage = feed(imageFeeder, "Image Feeder").exec(http("Log Picture Event").post("/").body(ByteArrayBody("${logEntry}"))).pause(Duration(pictureEventPause, TimeUnit.MILLISECONDS))
 
   val scn = scenario("ReportPortal load test")
-    .exec(session => session
+    .exec(session => {
+      session
       .set("projectName", projectName)
       .set("launchName", "LoadTestLaunch_" + UUID.randomUUID().toString)
-      .set("startTime", System.currentTimeMillis()))
+      .set("startTime", System.currentTimeMillis())
+      .set("suiteNumber", Random.nextInt(6))
+    })
     .exec(feed(userFeeder)
     .exec(http("Create Test Launch").post("${projectName}/launch").body(ElFileBody("startLaunch.json"))
       .check(status.is(200), jsonPath("$._id").saveAs("launchId")))
-    .exec(http("Create Test Suite").post("${projectName}/item").body(ElFileBody("startLaunch.json"))
+    .exec(http("Create Test Suite").post("${projectName}/item").body(ElFileBody("startSuite.json"))
       .check(status.is(200), jsonPath("$._id").saveAs("suiteId")))
-    .exec(http("Create Test Item").get("${project_name}/item/${suiteId}"))
-    .repeat(numberOfLogEventsInTest, "Log event") {
-      randomSwitch(95.0 -> postLog, 5.0 -> postImage)
+    .repeat("${suiteNumber}", "Suite") {
+      exec(http("Create Test Item").get("${project_name}/item/${suiteId}"))
+        .repeat(numberOfLogEventsInTest, "Log event") {
+          randomSwitch(95.0 -> postLog, 5.0 -> postImage)
+        }
     }
   )
 
