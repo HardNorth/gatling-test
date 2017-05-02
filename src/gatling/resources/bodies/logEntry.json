@@ -1,0 +1,11 @@
+[
+  {
+    "item_id": "58d76eec8b87bc00075393e5",
+    "time": 1490513474882,
+    "message": "SomeText",
+    "level": "INFO",
+    "file": {
+      "name": "filename"
+    }
+  }
+]

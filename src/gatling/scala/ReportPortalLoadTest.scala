@@ -43,9 +43,12 @@ class ReportPortalLoadTest extends Simulation {
   val imageFeeder = Iterator.continually(Map("logEntry" -> LogEntryGenerator.next(),
     "picture" -> PictureEntryGenerator.next(), "fileName" -> {UUID.randomUUID().toString + ".png"}))
 
-  val postLog = feed(textFeeder, "Text Feeder").exec(http("Log Text Event").post("/").body(StringBody("${logEntry}"))).pause(Duration(textEventPause, TimeUnit.MILLISECONDS))
+  val postLog = feed(textFeeder, "Text Feeder").exec(http("Log Text Event").post("${project_name}/log")
+    .body(ElFileBody("${logEntry}"))).pause(Duration(textEventPause, TimeUnit.MILLISECONDS))
 
-  val postImage = feed(imageFeeder, "Image Feeder").exec(http("Log Picture Event").post("/").body(ByteArrayBody("${logEntry}"))).pause(Duration(pictureEventPause, TimeUnit.MILLISECONDS))
+  //TODO: convert to multipart
+  val postImage = feed(imageFeeder, "Image Feeder").exec(http("Log Picture Event").post("${project_name}/log")
+    .body(ElFileBody("${logEntry}"))).pause(Duration(pictureEventPause, TimeUnit.MILLISECONDS))
 
   val scn = scenario("ReportPortal load test")
     .exec(session => {
