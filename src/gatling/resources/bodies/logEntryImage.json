@@ -3,6 +3,9 @@
     "item_id": "${stepId}",
     "time": ${entryTime},
     "message": "${logEntry}",
-    "level": "INFO"
+    "level": "INFO",
+    "file": {
+      "name": "${fileName}"
+    }
   }
 ]

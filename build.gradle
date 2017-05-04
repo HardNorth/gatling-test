@@ -33,5 +33,4 @@ dependencies{
 gatling {
     toolVersion = gatlingVersion
     jvmArgs = [ '-Xms1024M', '-Xmx1740M' ]
-    logLevel = 'WARN'
 }

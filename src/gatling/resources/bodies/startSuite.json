@@ -1,6 +1,6 @@
 {
-  "name": "Load Test Suite",
-  "start_time": ${startTime},
+  "name": "${suiteName}",
+  "start_time": ${suiteStartTime},
   "launch_id": "${launchId}",
   "type": "SUITE"
 }

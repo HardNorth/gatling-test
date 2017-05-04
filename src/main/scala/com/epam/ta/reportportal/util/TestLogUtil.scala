@@ -1,8 +1,8 @@
 package com.epam.ta.reportportal.util
 
+import java.awt._
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
-import java.awt._
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -43,8 +43,28 @@ private object Counter {
   def uniqueId(): Long = uniqueIdCounter.getAndIncrement()
 }
 
-private object LogEntry
-{
+object SuiteName {
+  def name(): String = {
+    val threadNumber = Counter.threadNumber()
+    StringUtils.join("Load Test Suite (", threadNumber, ") ", Counter.uniqueId())
+  }
+}
+
+object TestName {
+  def name(): String = {
+    val threadNumber = Counter.threadNumber()
+    StringUtils.join("Test (", threadNumber, ") ", Counter.uniqueId())
+  }
+}
+
+object TestStepName {
+  def name(): String = {
+    val threadNumber = Counter.threadNumber()
+    StringUtils.join("Test Step (", threadNumber, ") ", Counter.uniqueId())
+  }
+}
+
+private object LogEntry {
   val logTimeStampFormat = "HH:mm:ss.SSS"
 
   private val formats = new ConcurrentHashMap[Long, SimpleDateFormat]()
@@ -70,13 +90,13 @@ object LogEntryGenerator extends Iterator[String] {
 }
 
 object PictureEntryGenerator extends Iterator[Array[Byte]] {
-  private val backgroundColor = new Color(255,255,255)
-  private val fontColor = new Color(0,0,0)
+  private val backgroundColor = new Color(255, 255, 255)
+  private val fontColor = new Color(0, 0, 0)
   val imageWidth = 1366
   val imageHeight = 768
   val minColor = 0
   val maxColor = 256
-  val imageRect = new Rectangle(0,0,imageWidth, imageHeight)
+  val imageRect = new Rectangle(0, 0, imageWidth, imageHeight)
 
   override def hasNext: Boolean = true
 
