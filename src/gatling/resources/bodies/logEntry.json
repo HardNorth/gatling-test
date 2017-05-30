@@ -1,8 +1,6 @@
-[
-  {
-    "item_id": "${stepId}",
-    "time": ${entryTime},
-    "message": "${logEntry}",
-    "level": "INFO"
-  }
-]
+{
+  "item_id": "${testStepId}",
+  "time": ${entryTime},
+  "message": "${logEntry}",
+  "level": "INFO"
+}

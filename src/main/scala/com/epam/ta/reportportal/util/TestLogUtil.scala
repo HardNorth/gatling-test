@@ -64,6 +64,23 @@ object TestStepName {
   }
 }
 
+object ServiceTimeFormat {
+  val logTimeStampFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSX"
+
+  private val formats = new ConcurrentHashMap[Long, SimpleDateFormat]()
+
+  def format(time: Long): String = {
+    val threadNumber = Counter.threadNumber()
+    val sdf: SimpleDateFormat = formats.computeIfAbsent(threadNumber, new java.util.function.Function[Long, SimpleDateFormat]() {
+      @Override
+      def apply(key: Long): SimpleDateFormat = {
+        new SimpleDateFormat(logTimeStampFormat)
+      }
+    })
+    sdf.format(new Date(time))
+  }
+}
+
 private object LogEntry {
   val logTimeStampFormat = "HH:mm:ss.SSS"
 
@@ -71,7 +88,12 @@ private object LogEntry {
 
   def logEntry(payload: String): String = {
     val threadNumber = Counter.threadNumber()
-    val sdf: SimpleDateFormat = formats.computeIfAbsent(threadNumber, (k) => new SimpleDateFormat(logTimeStampFormat))
+    val sdf: SimpleDateFormat = formats.computeIfAbsent(threadNumber, new java.util.function.Function[Long, SimpleDateFormat]() {
+      @Override
+      def apply(key: Long): SimpleDateFormat = {
+        new SimpleDateFormat(logTimeStampFormat)
+      }
+    })
 
     StringUtils.join(sdf.format(new Date()), " [Test thread (", threadNumber, ")] DEBUG TC", threadNumber,
       "_VerifyTextLogging - ", Counter.uniqueId(), " - ", payload)

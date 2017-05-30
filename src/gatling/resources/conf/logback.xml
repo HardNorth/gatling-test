@@ -22,23 +22,21 @@
         </rollingPolicy>
 
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>2MB</MaxFileSize>
+            <MaxFileSize>1024MB</MaxFileSize>
         </triggeringPolicy>
     </appender>
 
     <!-- Uncomment for logging ALL HTTP request and responses -->
-    <!--<logger name="io.gatling.http.ahc" level="TRACE" >-->
-        <!--<appender-ref ref="STDOUT" />-->
-        <!--<appender-ref ref="FILE" />-->
-    <!--</logger>-->
-    <logger name="io.gatling.http.response" level="INFO" />
-    <logger name="com.jayway.jsonpath" level="INFO" />
+    <!--<logger name="io.gatling.http.ahc" level="TRACE" />-->
+    <!--<logger name="io.gatling.http.response" level="TRACE" />-->
+    <!--<logger name="com.jayway.jsonpath" level="TRACE" />-->
     <!-- Uncomment for logging ONLY FAILED HTTP request and responses -->
     <!-- 	<logger name="io.gatling.http.ahc" level="DEBUG" /> -->
     <!--    <logger name="io.gatling.http.response" level="DEBUG" /> -->
 
-    <root level="DEBUG">
-        <appender-ref ref="CONSOLE" />
+    <root level="INFO">
+        <!--<appender-ref ref="CONSOLE" />-->
+        <appender-ref ref="FILE" />
     </root>
 
 </configuration>
