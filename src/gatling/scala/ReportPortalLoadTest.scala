@@ -53,8 +53,8 @@ class ReportPortalLoadTest extends Simulation {
 
   //TODO: convert to multipart
   private val postImage = feed(imageFeeder).exec(http("Log Picture Event").post("${projectName}/log")
-    .bodyPart(ElFileBodyPart("logEntryImage.json").contentType("application/json").contentId("json_request_part"))
-    .bodyPart(ByteArrayBodyPart("${picture}").fileName("${fileName}").contentType("image/png")).headers(headers)
+    .bodyPart(ElFileBodyPart("json_request_part", "logEntryImage.json").contentType("application/json"))
+    .bodyPart(ByteArrayBodyPart("binary_part", "${picture}").fileName("${fileName}").contentType("image/png")).headers(headers)
     .asMultipartForm).pause(Duration(pictureEventPause, TimeUnit.MILLISECONDS))
 
   // Entry Chain

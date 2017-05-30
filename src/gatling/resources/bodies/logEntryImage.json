@@ -1,9 +1,11 @@
-{
-  "item_id": "${testStepId}",
-  "time": ${entryTime},
-  "message": "${logEntry}",
-  "level": "INFO",
-  "file": {
-    "name": "${fileName}"
+[
+  {
+    "item_id": "${testStepId}",
+    "time": ${entryTime},
+    "message": "${logEntry}",
+    "level": "INFO",
+    "file": {
+      "name": "${fileName}"
+    }
   }
-}
+]
