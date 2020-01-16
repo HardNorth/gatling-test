@@ -20,7 +20,7 @@ import scala.util.Random
 
 object ReportPortalLoadTest {
   val IMAGE_GENERATORS: ThreadLocal[PictureEntryGenerator] =
-    ThreadLocal.withInitial(() => new PictureEntryGenerator(320, 240))
+    ThreadLocal.withInitial(() => new PictureEntryGenerator())
 
   val PROPERTIES: Properties = try {
     val prop = new Properties()
@@ -63,7 +63,7 @@ object ReportPortalLoadTest {
 
 
   // Entry Chain
-  val entry =
+  val entry: ChainBuilder =
     exec(session =>
       session
         .set("entryTime", System.currentTimeMillis())
@@ -71,7 +71,7 @@ object ReportPortalLoadTest {
       .randomSwitch(95.0 -> postLog, 5.0 -> postImage)
 
   // Test Step Chain
-  val testStep =
+  val testStep: ChainBuilder =
     exec(session =>
       session
         .set("testStepName", TestStepName.name())
