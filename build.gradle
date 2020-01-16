@@ -2,7 +2,7 @@
  * Module: [gatling-test]
  */
 plugins {
-    id "com.github.lkishalmi.gatling" version "0.4.1"
+    id "com.github.lkishalmi.gatling" version "3.2.1"
 }
 
 apply plugin: 'scala'
@@ -12,13 +12,13 @@ repositories{
     mavenCentral()
 }
 
-def gatlingVersion = '2.2.5'
+def gatlingVersion = '3.2.1'
 
 dependencies{
     ext.testVersions = [
             commonslang3: '3.5',
             commonsMath3: '3.6.1',
-            scala       : '2.11.8',
+            scala       : '2.12.7',
             scalaModules: '0.8.0',
             gatling     : gatlingVersion,
 
