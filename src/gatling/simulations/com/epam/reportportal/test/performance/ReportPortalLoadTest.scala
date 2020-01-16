@@ -43,7 +43,7 @@ object ReportPortalLoadTest {
 
   private val headers: Map[String, String] = new Map2("Authorization", "bearer ${password}", "Content-Type", "application/json")
 
-  private val userFeeder = csv(usersFileName).circular
+  private val userFeeder = new CsvFeeder(usersFileName).circular
 
   private val textFeeder = Iterator.continually(Map("logEntry" -> StringEscapeUtils.escapeJava(LogEntryGenerator.next())))
 
@@ -196,7 +196,7 @@ object ReportPortalLoadTest {
         .set("itemStopDate", ServiceTimeFormat.format(session("launchStopTime").as[Long]))
     )
     // Send Finish Launch Request
-    .exec(http("Finish Suite").put("${projectName}/launch/${launchId}/finish").body(ElFileBody("bodies/stopItem.json"))
+    .exec(http("Finish Test Launch").put("${projectName}/launch/${launchId}/finish").body(ElFileBody("bodies/stopItem.json"))
       .headers(headers).check(status.is(200)))
 }
 
