@@ -1,16 +1,10 @@
 package com.epam.ta.reportportal.util
 
-import java.awt._
-import java.awt.geom.Ellipse2D
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
-import javax.imageio.ImageIO
+import java.util.concurrent.{ConcurrentHashMap, ThreadLocalRandom}
 
-import org.apache.commons.lang3.RandomUtils._
 import org.apache.commons.lang3.{RandomStringUtils, StringUtils}
 import org.apache.commons.math3.distribution.GammaDistribution
 
@@ -22,8 +16,6 @@ private object Random {
 }
 
 private object Counter {
-  private val uniqueIdCounter: AtomicLong = new AtomicLong()
-
   private val threadIdCounter: AtomicLong = new AtomicLong()
 
   private val threads = new ConcurrentHashMap[Long, Long]()
@@ -40,7 +32,7 @@ private object Counter {
     }
   }
 
-  def uniqueId(): Long = uniqueIdCounter.getAndIncrement()
+  def uniqueId(): String = StringUtils.join(System.currentTimeMillis(), "-", threadNumber(), "-", ThreadLocalRandom.current().nextInt(100000))
 }
 
 object SuiteName {
