@@ -21,15 +21,7 @@ private object Counter {
   private val threads = new ConcurrentHashMap[Long, Long]()
 
   def threadNumber(): Long = {
-    val threadId = Thread.currentThread().getId
-    if (threads.containsKey(threadId)) {
-      threads.get(threadId)
-    }
-    else {
-      val number = threadIdCounter.getAndIncrement()
-      threads.put(threadId, number)
-      number
-    }
+    threads.computeIfAbsent(Thread.currentThread().getId, _ => threadIdCounter.getAndIncrement())
   }
 
   def uniqueId(): String = StringUtils.join(System.currentTimeMillis(), "-", threadNumber(), "-", ThreadLocalRandom.current().nextInt(100000))
@@ -62,13 +54,7 @@ object ServiceTimeFormat {
   private val formats = new ConcurrentHashMap[Long, SimpleDateFormat]()
 
   def format(time: Long): String = {
-    val threadNumber = Counter.threadNumber()
-    val sdf: SimpleDateFormat = formats.computeIfAbsent(threadNumber, new java.util.function.Function[Long, SimpleDateFormat]() {
-      @Override
-      def apply(key: Long): SimpleDateFormat = {
-        new SimpleDateFormat(logTimeStampFormat)
-      }
-    })
+    val sdf: SimpleDateFormat = formats.computeIfAbsent(Counter.threadNumber(), _ => new SimpleDateFormat(logTimeStampFormat))
     sdf.format(new Date(time))
   }
 }
@@ -80,12 +66,7 @@ private object LogEntry {
 
   def logEntry(payload: String): String = {
     val threadNumber = Counter.threadNumber()
-    val sdf: SimpleDateFormat = formats.computeIfAbsent(threadNumber, new java.util.function.Function[Long, SimpleDateFormat]() {
-      @Override
-      def apply(key: Long): SimpleDateFormat = {
-        new SimpleDateFormat(logTimeStampFormat)
-      }
-    })
+    val sdf: SimpleDateFormat = formats.computeIfAbsent(threadNumber, _ => new SimpleDateFormat(logTimeStampFormat))
 
     StringUtils.join(sdf.format(new Date()), " [Test thread (", threadNumber, ")] DEBUG TC", threadNumber,
       "_VerifyTextLogging - ", Counter.uniqueId(), " - ", payload)
